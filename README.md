@@ -19,7 +19,7 @@ It makes it simpler to create and control other terminal applications.
 
 	child.Spawn("/bin/sh -c 'echo \"my complicated command\" | tee log | cat > log2'")
 	child.ReadLine() // ReadLine() (string, error)
-	child.ReadUntil(' ') // ReadUntil(delim byte) ([]byte, error)
+	child.ReadUntil([]string{" "}) // ReadUntil(delim []string) ([]byte, error)
 
 `ReadLine`, `ReadUntil` and `SendLine` send strings from/to `stdout/stdin` respectively
 
@@ -45,7 +45,7 @@ It makes it simpler to create and control other terminal applications.
 
 `ExpectRegex` uses golang's internal regex engine to wait until a match from the process with the given regular expression (or an error on process termination with no match).
 
-	child, _ := gexpect.Spawn("echo accb")	
+	child, _ := gexpect.Spawn("echo accb")
 	match, _ := child.ExpectRegex("a..b")
 	// (match=true)
 
@@ -59,6 +59,6 @@ See `gexpect_test.go` and the `examples` folder for full syntax
 
 ## Credits
 
-	github.com/kballard/go-shellquote	
+	github.com/kballard/go-shellquote
 	github.com/kr/pty
 	KMP Algorithm: "http://blog.databigbang.com/searching-for-substrings-in-streams-a-slight-modification-of-the-knuth-morris-pratt-algorithm-in-haxe/"

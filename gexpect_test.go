@@ -201,14 +201,17 @@ func TestReadLine(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if s != "foo\r" {
+	if s != "foo\r\n" && s != "foo\n" && s != "foo\r" {
 		t.Fatalf("expected 'foo\\r', got '%s'", s)
 	}
+
 	s, err = child.ReadLine()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if s != "bar\r" {
+	if s != "bar\r\n" && s != "bar\n" && s != "bar\r" {
+		fmt.Printf("%#v", "bar\r")
+		fmt.Printf("%#v", s)
 		t.Fatalf("expected 'bar\\r', got '%s'", s)
 	}
 }

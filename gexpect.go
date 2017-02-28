@@ -377,22 +377,30 @@ func (expect *ExpectSubprocess) Interact() {
 	go io.Copy(expect.buf.f, os.Stdin)
 }
 
-func (expect *ExpectSubprocess) ReadUntil(delim byte) ([]byte, error) {
+func (expect *ExpectSubprocess) ReadUntil(delim []string) ([]byte, error) {
 	join := make([]byte, 0, 512)
 	chunk := make([]byte, 255)
 
 	for {
 		n, err := expect.buf.Read(chunk)
 
-		for i := 0; i < n; i++ {
-			if chunk[i] == delim {
-				if len(chunk) > i+1 {
-					expect.buf.PutBack(chunk[i+1:n])
+		for i, _ := range chunk {
+			for _, delimiter := range delim {
+				if i <= n-len(delimiter) {
+					tail := chunk[i : i+len(delimiter)]
+					if bytes.Compare([]byte(delimiter), tail) == 0 {
+						if len(chunk) > i+len(delimiter) {
+							expect.buf.PutBack(chunk[i+len(delimiter) : n])
+						}
+						for _, tail_byte := range tail {
+							join = append(join, tail_byte)
+						}
+						return join, nil
+					}
 				}
-				return join, nil
-			} else {
-				join = append(join, chunk[i])
 			}
+
+			join = append(join, chunk[i])
 		}
 
 		if err != nil {
@@ -406,7 +414,7 @@ func (expect *ExpectSubprocess) Wait() error {
 }
 
 func (expect *ExpectSubprocess) ReadLine() (string, error) {
-	str, err := expect.ReadUntil('\n')
+	str, err := expect.ReadUntil([]string{"\r\n", "\n", "\r"})
 	return string(str), err
 }
 
